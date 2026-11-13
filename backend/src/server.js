@@ -3,145 +3,227 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { randomUUID } from "crypto";
+import pool from "./config/db.js";
 
 dotenv.config();
 
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Temporary in-memory storage
-// MySQL integration will be done in Step 3.
-let tasks = [];
-
-// Health Check API
+// Health Check
 app.get("/api/health", (req, res) => {
   res.status(200).json({
     success: true,
     message: "Task Management API is running",
+    database: "MySQL",
     environment: process.env.NODE_ENV,
   });
 });
 
-// Get all tasks
-app.get("/api/tasks", (req, res) => {
-  res.status(200).json({
-    success: true,
-    count: tasks.length,
-    data: tasks,
-  });
-});
+// Get All Tasks
+app.get("/api/tasks", async (req, res) => {
+  try {
+    const [tasks] = await pool.execute(
+      "SELECT * FROM tasks ORDER BY created_at DESC"
+    );
 
-// Get single task
-app.get("/api/tasks/:id", (req, res) => {
-  const task = tasks.find((t) => t.id === req.params.id);
-
-  if (!task) {
-    return res.status(404).json({
+    res.status(200).json({
+      success: true,
+      count: tasks.length,
+      data: tasks,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
       success: false,
-      message: "Task not found",
+      message: "Failed to retrieve tasks",
     });
   }
-
-  res.status(200).json({
-    success: true,
-    data: task,
-  });
 });
 
-// Create task
-app.post("/api/tasks", (req, res) => {
-  const { title, description } = req.body;
+// Get Single Task
+app.get("/api/tasks/:id", async (req, res) => {
+  try {
+    const [tasks] = await pool.execute(
+      "SELECT * FROM tasks WHERE id = ?",
+      [req.params.id]
+    );
 
-  if (!title || typeof title !== "string" || !title.trim()) {
-    return res.status(400).json({
+    if (tasks.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Task not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: tasks[0],
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
       success: false,
-      message: "Task title is required",
+      message: "Failed to retrieve task",
     });
   }
-
-  const newTask = {
-    id: randomUUID(),
-    title: title.trim(),
-    description: description || "",
-    status: "pending",
-    createdAt: new Date().toISOString(),
-  };
-
-  tasks.push(newTask);
-
-  res.status(201).json({
-    success: true,
-    message: "Task created successfully",
-    data: newTask,
-  });
 });
 
-// Update task
-app.put("/api/tasks/:id", (req, res) => {
-  const task = tasks.find((t) => t.id === req.params.id);
+// Create Task
+app.post("/api/tasks", async (req, res) => {
+  try {
+    const { title, description } = req.body;
 
-  if (!task) {
-    return res.status(404).json({
+    if (!title || typeof title !== "string" || !title.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Task title is required",
+      });
+    }
+
+    const id = randomUUID();
+
+    await pool.execute(
+      `INSERT INTO tasks (id, title, description)
+       VALUES (?, ?, ?)`,
+      [id, title.trim(), description || ""]
+    );
+
+    const [tasks] = await pool.execute(
+      "SELECT * FROM tasks WHERE id = ?",
+      [id]
+    );
+
+    res.status(201).json({
+      success: true,
+      message: "Task created successfully",
+      data: tasks[0],
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
       success: false,
-      message: "Task not found",
+      message: "Failed to create task",
     });
   }
+});
 
-  const { title, description, status } = req.body;
+// Update Task
+app.put("/api/tasks/:id", async (req, res) => {
+  try {
+    const { title, description, status } = req.body;
 
-  if (title !== undefined) {
-    if (typeof title !== "string" || !title.trim()) {
+    const [existing] = await pool.execute(
+      "SELECT * FROM tasks WHERE id = ?",
+      [req.params.id]
+    );
+
+    if (existing.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Task not found",
+      });
+    }
+
+    if (
+      title !== undefined &&
+      (typeof title !== "string" || !title.trim())
+    ) {
       return res.status(400).json({
         success: false,
         message: "Invalid task title",
       });
     }
-    task.title = title.trim();
-  }
 
-  if (description !== undefined) {
-    task.description = description;
-  }
-
-  if (status !== undefined) {
-    if (!["pending", "in-progress", "completed"].includes(status)) {
+    if (
+      status !== undefined &&
+      !["pending", "in-progress", "completed"].includes(status)
+    ) {
       return res.status(400).json({
         success: false,
         message: "Invalid task status",
       });
     }
-    task.status = status;
-  }
 
-  res.status(200).json({
-    success: true,
-    message: "Task updated successfully",
-    data: task,
-  });
-});
+    const fields = [];
+    const values = [];
 
-// Delete task
-app.delete("/api/tasks/:id", (req, res) => {
-  const taskIndex = tasks.findIndex(
-    (t) => t.id === req.params.id
-  );
+    if (title !== undefined) {
+      fields.push("title = ?");
+      values.push(title.trim());
+    }
 
-  if (taskIndex === -1) {
-    return res.status(404).json({
+    if (description !== undefined) {
+      fields.push("description = ?");
+      values.push(description);
+    }
+
+    if (status !== undefined) {
+      fields.push("status = ?");
+      values.push(status);
+    }
+
+    if (fields.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No fields provided for update",
+      });
+    }
+
+    values.push(req.params.id);
+
+    await pool.execute(
+      `UPDATE tasks SET ${fields.join(", ")} WHERE id = ?`,
+      values
+    );
+
+    const [updated] = await pool.execute(
+      "SELECT * FROM tasks WHERE id = ?",
+      [req.params.id]
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Task updated successfully",
+      data: updated[0],
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
       success: false,
-      message: "Task not found",
+      message: "Failed to update task",
     });
   }
+});
 
-  tasks.splice(taskIndex, 1);
+// Delete Task
+app.delete("/api/tasks/:id", async (req, res) => {
+  try {
+    const [result] = await pool.execute(
+      "DELETE FROM tasks WHERE id = ?",
+      [req.params.id]
+    );
 
-  res.status(200).json({
-    success: true,
-    message: "Task deleted successfully",
-  });
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Task not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Task deleted successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete task",
+    });
+  }
 });
 
 // 404 Handler
@@ -152,10 +234,11 @@ app.use((req, res) => {
   });
 });
 
-// Start server
+// Start Server
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV}`);
+  console.log("Database: MySQL");
 });

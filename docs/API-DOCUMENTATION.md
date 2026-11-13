@@ -130,8 +130,12 @@ npm start
 
 ## 9. Current Database Status
 
-Current development version uses
-temporary in-memory storage.
+The application uses MySQL 8.0.46
+for persistent task data storage.
+
+Database: task_management_db
+Table: tasks
+Driver: mysql2
 
 MySQL database integration will be
 implemented in the next development phase.
