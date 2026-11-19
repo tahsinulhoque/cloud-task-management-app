@@ -18,7 +18,7 @@ function App() {
       const response = await fetch(API_URL)
       if (!response.ok) throw new Error('Failed to fetch tasks')
       const data = await response.json()
-      setTasks(Array.isArray(data) ? data : data.tasks || [])
+      setTasks(data.data || [])
     } catch (err) {
       setError('Cannot connect to backend. Make sure the API server is running.')
     } finally {
