@@ -16,6 +16,7 @@ The application allows users to create, view, edit, delete, and update the statu
 | Backend | Node.js, Express.js |
 | Database | MySQL 8.0 |
 | Database Driver | mysql2 |
+| Containerization | Docker, Docker Compose |
 | API | REST API |
 | Development Tools | VS Code, Git, GitHub |
 | API Testing | PowerShell Invoke-RestMethod |
@@ -29,10 +30,12 @@ cloud-task-management-app/
 │   ├── src/
 │   │   ├── config/
 │   │   │   └── db.js
-│   │   └── server.js
+│   │   ├── server.js
+│   │   ├── Dockerfile
+│   │   └── package.json
+│   │
 │   ├── .env
-│   ├── .env.example
-│   └── package.json
+│   └── .env.example
 │
 ├── frontend/
 │   ├── public/
@@ -40,12 +43,15 @@ cloud-task-management-app/
 │   │   ├── App.jsx
 │   │   ├── App.css
 │   │   └── index.css
+│   ├── Dockerfile
 │   └── package.json
 │
 ├── docs/
 │   ├── API-DOCUMENTATION.md
 │   └── DATABASE-DOCUMENTATION.md
 │
+├── docker-compose.yml
+├── .env
 ├── .gitignore
 └── README.md
 ```
@@ -90,21 +96,36 @@ cloud-task-management-app/
 
 - Connected the React frontend with the Express.js REST API.
 - Integrated frontend task operations with the MySQL database.
-- Verified task creation from the frontend.
-- Verified task retrieval and display from the database.
+- Verified task creation and retrieval.
 - Tested task editing functionality.
 - Tested task status updates.
 - Verified task deletion functionality.
 - Fixed API response handling to display database records correctly.
-- Confirmed successful communication between the frontend, backend, and MySQL database.
+- Confirmed successful communication between frontend, backend, and MySQL.
 
 **Integration Testing Result:** All CRUD operations successfully tested.
 
-### 6. Documentation
+### 6. Dockerization
+
+- Created a Dockerfile for the Node.js backend.
+- Created a Dockerfile for the React frontend.
+- Configured Docker Compose to orchestrate frontend, backend, and MySQL services.
+- Configured environment variables for containerized services.
+- Implemented persistent MySQL storage using Docker volumes.
+- Configured Docker networking for inter-container communication.
+- Built frontend and backend Docker images.
+- Started all three services using Docker Compose.
+- Created the MySQL tasks table inside the Docker database.
+- Verified frontend and backend connectivity through Docker.
+- Tested task CRUD operations in the containerized environment.
+
+**Dockerization Result:** Frontend, backend, and MySQL successfully running as Docker Compose services.
+
+### 7. Documentation
 
 - Created API documentation.
 - Created database documentation.
-- Documented project structure and technology stack.
+- Documented project structure, technology stack, and setup instructions.
 
 ## API Endpoints
 
@@ -134,6 +155,50 @@ Base URL: `http://localhost:5000`
 | created_at | TIMESTAMP | Creation timestamp |
 | updated_at | TIMESTAMP | Last update timestamp |
 
+## Docker Architecture
+
+The application uses Docker Compose to manage three services:
+
+| Service | Technology | Port |
+|---|---|---|
+| Frontend | React + Vite | 5173 |
+| Backend | Node.js + Express.js | 5000 |
+| Database | MySQL 8.0 | 3306 (container), 3307 (host) |
+
+### Docker Commands
+
+Build Docker images:
+
+```bash
+docker compose build
+```
+
+Start all services:
+
+```bash
+docker compose up -d
+```
+
+Check running containers:
+
+```bash
+docker compose ps
+```
+
+View container logs:
+
+```bash
+docker compose logs
+```
+
+Stop all services:
+
+```bash
+docker compose down
+```
+
+**Note:** MySQL data is persisted using a Docker named volume. The database table must be initialized before using the application with a fresh database volume.
+
 ## Local Development Setup
 
 ### Prerequisites
@@ -141,6 +206,7 @@ Base URL: `http://localhost:5000`
 - Node.js and npm
 - MySQL Server 8.0+
 - Git
+- Docker Desktop
 
 ### Backend Setup
 
@@ -149,7 +215,7 @@ cd backend
 npm install
 ```
 
-Configure your `backend/.env` file:
+Configure `backend/.env`:
 
 ```env
 PORT=5000
@@ -161,15 +227,11 @@ DB_PASSWORD=your_mysql_password
 DB_NAME=task_management_db
 ```
 
-Start the backend using the configured development script:
+Start the backend:
 
 ```bash
 npm run dev
 ```
-
-Backend API URL:
-
-`http://localhost:5000`
 
 ### Frontend Setup
 
@@ -181,13 +243,15 @@ npm install
 npm run dev
 ```
 
-Frontend development URL:
+Frontend URL:
 
 `http://localhost:5173`
 
-## Project Roadmap
+Backend API URL:
 
-The following stages are planned and tracked:
+`http://localhost:5000`
+
+## Project Roadmap
 
 - [x] Project initialization and GitHub setup
 - [x] Node.js and Express.js REST API
@@ -195,7 +259,7 @@ The following stages are planned and tracked:
 - [x] React and Vite frontend setup
 - [x] Task management UI
 - [x] Frontend-backend integration testing
-- [ ] Dockerize frontend, backend, and database services
+- [x] Dockerize frontend, backend, and database services
 - [ ] Configure AWS account and IAM
 - [ ] Configure AWS networking and VPC
 - [ ] Provision AWS EC2 infrastructure
@@ -211,9 +275,9 @@ The following stages are planned and tracked:
 
 **Development in Progress**
 
-The backend REST API, MySQL database integration, React frontend, and frontend-backend CRUD integration testing have been completed.
+The backend REST API, MySQL database integration, React frontend, frontend-backend integration testing, and Docker containerization have been completed.
 
-The next milestone is Dockerization, followed by AWS infrastructure setup, cloud deployment, and monitoring.
+The next milestone is AWS account and IAM configuration, followed by cloud infrastructure setup, deployment, and monitoring.
 
 ## Author
 
