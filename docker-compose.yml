@@ -19,7 +19,7 @@ services:
     env_file:
       - ./backend/.env
     environment:
-      DB_HOST: mysql
+      DB_HOST: cloud-task-db.c3umgg80opzf.us-west-2.rds.amazonaws.com
       DB_PORT: 3306
       DB_NAME: task_management_db
     ports:
