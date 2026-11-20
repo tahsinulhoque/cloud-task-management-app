@@ -92,13 +92,23 @@ The following diagram represents the implemented application deployment and AWS 
 
 ### 4.2 Amazon RDS — Managed Database
 
-- Created an Amazon RDS MySQL database instance.
-- Used MySQL 8.4.
-- Created the `task_management_db` database.
-- Created the `tasks` table.
-- Configured the backend to connect to the RDS endpoint.
+Amazon RDS MySQL was provisioned and deployed as the application's managed database during the project implementation.
+
+Implementation:
+
+- Created an Amazon RDS MySQL 8.4 database instance.
+
+- Created the task_management_db database.
+
+- Created the tasks table for application data.
+
+- Configured the backend application to connect to the RDS endpoint.
+
 - Configured database access through the EC2 security group.
-- Verified task creation and data persistence directly in RDS.
+
+- Successfully tested backend-to-RDS connectivity.
+
+- Created task records through the application and verified data persistence directly in the RDS database.
 
 **Database Configuration**
 
@@ -120,6 +130,8 @@ The following diagram represents the implemented application deployment and AWS 
 | description | TEXT |
 | status | VARCHAR(50) |
 | created_at | TIMESTAMP |
+
+The RDS deployment, backend connectivity, and database persistence were successfully verified. The RDS instance has since been decommissioned.
 
 ### 4.3 Amazon VPC — Virtual Networking
 
