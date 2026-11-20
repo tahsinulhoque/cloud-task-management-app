@@ -37,7 +37,7 @@ Additional AWS services were configured to support networking, object storage, m
 
 The following diagram represents the implemented application deployment and AWS infrastructure.
 
-![Cloud Task Management App - AWS Architecture](./docs/architecture1.png)
+![Cloud Task Management App - AWS Architecture](./docs/screenshots/architecture1.png)
 
 ### Architecture Flow
 
