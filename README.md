@@ -1,286 +1,317 @@
-# Cloud-Based Task Management Application
+# Cloud Task Management App
 
-A full-stack task management application designed to help users create, manage, update, and track their daily tasks. This project is being developed step by step with a focus on backend development, database integration, frontend development, containerization, and cloud deployment.
+### Full-Stack Application Deployment on AWS
 
-## Project Overview
+A full-stack task management application deployed on Amazon Web Services (AWS). This project demonstrates practical implementation of AWS cloud services, application containerization, managed database integration, virtual networking, object storage, and cloud resource monitoring.
 
-The Cloud-Based Task Management Application provides a REST API and a React-based user interface for managing tasks. The backend is built with Node.js and Express.js, while MySQL is used for persistent data storage.
+**Live Application:** [http://44.247.241.123:5173](http://44.247.241.123:5173)
 
-The application allows users to create, view, edit, delete, and update the status of their tasks through an interactive web interface.
+**GitHub Repository:** [cloud-task-management-app](https://github.com/tahsinulhoque/cloud-task-management-app)
 
-## Technology Stack
+---
+
+## 1. Project Overview
+
+The goal of this project was to build and deploy a task management web application using a full-stack architecture and AWS cloud infrastructure.
+
+The application uses React and Vite for the frontend, Node.js and Express.js for the backend, and Amazon RDS MySQL for persistent database storage.
+
+The application services are containerized using Docker Compose and deployed on an Ubuntu-based Amazon EC2 instance.
+
+Additional AWS services were configured to support networking, object storage, monitoring, and resource quota verification.
+
+### Key Implementations
+
+- Deployed a full-stack application on Amazon EC2.
+- Containerized frontend and backend services using Docker Compose.
+- Connected the backend application to Amazon RDS MySQL.
+- Configured a custom AWS VPC with public and private subnets.
+- Created a private Amazon S3 bucket and verified object upload.
+- Monitored EC2 metrics using Amazon CloudWatch.
+- Reviewed EC2 resource limits through AWS Service Quotas.
+- Verified application logs using Docker Compose.
+
+---
+
+## 2. AWS Architecture
+
+The following diagram represents the implemented application deployment and AWS infrastructure.
+
+![Cloud Task Management App - AWS Architecture](./docs/architecture1.png)
+
+### Architecture Flow
+
+1. Users access the application through a web browser.
+2. The React + Vite frontend is hosted on Amazon EC2.
+3. The frontend communicates with the Node.js + Express backend through the configured API proxy.
+4. The backend connects to Amazon RDS MySQL for task data storage and retrieval.
+5. Amazon S3 is configured as private object storage, with a test object successfully uploaded.
+6. Amazon CloudWatch is used to monitor EC2 CPU utilization and network metrics.
+7. AWS Service Quotas is used to review EC2 resource quota information.
+
+---
+
+## 3. Technology Stack
 
 | Category | Technologies |
 |---|---|
-| Frontend | React.js, Vite, JavaScript, CSS |
+| Frontend | React, Vite |
 | Backend | Node.js, Express.js |
-| Database | MySQL 8.0 |
-| Database Driver | mysql2 |
+| Database | MySQL, Amazon RDS |
 | Containerization | Docker, Docker Compose |
-| API | REST API |
-| Development Tools | VS Code, Git, GitHub |
-| API Testing | PowerShell Invoke-RestMethod |
+| Cloud Platform | AWS |
+| Compute | Amazon EC2 |
+| Object Storage | Amazon S3 |
+| Networking | Amazon VPC, Subnets, Security Groups |
+| Monitoring | Amazon CloudWatch |
+| Operating System | Ubuntu 24.04 LTS |
+| Version Control | Git, GitHub |
 
-## Project Structure
+---
+
+## 4. AWS Infrastructure Implementation
+
+### 4.1 Amazon EC2 — Application Hosting
+
+- Launched an Ubuntu 24.04 LTS EC2 instance.
+- Used a t3.micro instance for application hosting.
+- Configured SSH access to the instance.
+- Deployed frontend and backend services using Docker Compose.
+- Configured the application to listen on the required network interfaces.
+- Verified application accessibility through the EC2 public IP address.
+
+**Deployment Details**
+
+| Configuration | Value |
+|---|---|
+| Instance Type | t3.micro |
+| Operating System | Ubuntu 24.04 LTS |
+| Frontend Port | 5173 |
+| Backend Port | 5000 |
+| Container Management | Docker Compose |
+
+### 4.2 Amazon RDS — Managed Database
+
+- Created an Amazon RDS MySQL database instance.
+- Used MySQL 8.4.
+- Created the `task_management_db` database.
+- Created the `tasks` table.
+- Configured the backend to connect to the RDS endpoint.
+- Configured database access through the EC2 security group.
+- Verified task creation and data persistence directly in RDS.
+
+**Database Configuration**
+
+| Configuration | Value |
+|---|---|
+| Database Engine | MySQL |
+| Engine Version | 8.4 |
+| Database Name | task_management_db |
+| Database Table | tasks |
+| Port | 3306 |
+| Public Access | No |
+
+**Tasks Table Structure**
+
+| Column | Data Type |
+|---|---|
+| id | VARCHAR(36) — Primary Key |
+| title | VARCHAR(255) |
+| description | TEXT |
+| status | VARCHAR(50) |
+| created_at | TIMESTAMP |
+
+### 4.3 Amazon VPC — Virtual Networking
+
+Created and configured a dedicated VPC for the project.
+
+**VPC Configuration**
+
+| Component | Configuration |
+|---|---|
+| VPC Name | cloud-task-management-vpc |
+| VPC CIDR | 10.0.0.0/16 |
+| Public Subnet | 10.0.1.0/24 |
+| Private Subnet | 10.0.2.0/24 |
+| Internet Gateway | Configured |
+| Public Route | 0.0.0.0/0 → Internet Gateway |
+| Database Subnet Group | cloud-task-db-subnet-group |
+
+**Networking Implementation**
+
+- Created a custom VPC.
+- Configured a public subnet for EC2 application hosting.
+- Configured a private subnet for database networking.
+- Attached an Internet Gateway to the VPC.
+- Configured the public subnet route table.
+- Configured security groups to control application and database access.
+- Created an RDS DB subnet group for database networking.
+
+### 4.4 Amazon S3 — Object Storage
+
+- Created an S3 bucket named `cloud-task-management-assets-2026-unique`.
+- Kept S3 Block Public Access enabled.
+- Uploaded a test object successfully.
+- Verified the uploaded object in the S3 bucket.
+
+The bucket was kept private during this implementation. Application-to-S3 integration was not part of the verified deployment.
+
+### 4.5 Amazon CloudWatch — EC2 Monitoring
+
+Used Amazon CloudWatch to review EC2 instance monitoring metrics.
+
+**Verified Metrics**
+
+- CPU Utilization
+- Network In
+- Network Out
+
+EC2 monitoring metrics were reviewed through the AWS Console.
+
+### 4.6 Application Logging
+
+Used Docker Compose to inspect backend application logs.
+
+- Verified backend startup messages.
+- Reviewed application runtime information.
+- Used Docker Compose logs for troubleshooting and inspection.
+
+**Example command:**
+
+```bash
+docker compose logs --tail=50 backend
+```
+
+### 4.7 AWS Service Quotas — Resource Limit Review
+
+Reviewed EC2 On-Demand instance quota information through AWS Service Quotas.
+
+| Quota Information | Value |
+|---|---:|
+| Applied Quota | 16 |
+| Current Utilization | 2 |
+| Remaining Quota | 14 |
+
+The quota information was reviewed through the AWS Console. No quota increase was requested.
+
+---
+
+## 5. Application Deployment
+
+The application was deployed on an Ubuntu EC2 instance using Docker Compose.
+
+### Application Services
+
+| Service | Technology | Port |
+|---|---|---:|
+| Frontend | React + Vite | 5173 |
+| Backend | Node.js + Express | 5000 |
+| Local MySQL Container | MySQL | 3307 (host mapping) |
+| Production Database | Amazon RDS MySQL | 3306 |
+
+### Application Communication Flow
+
+```text
+Web Browser
+    |
+    v
+React + Vite Frontend
+    |
+    | API Requests (/api)
+    v
+Node.js + Express Backend
+    |
+    | MySQL Connection
+    v
+Amazon RDS MySQL
+    |
+    v
+task_management_db
+```
+
+The frontend uses a Vite proxy to communicate with the backend service. The backend uses the Amazon RDS endpoint for the deployed application's database connection.
+
+---
+
+## 6. Verified Project Results
+
+The following results were successfully implemented and verified during the project:
+
+| Implementation | Result |
+|---|---|
+| EC2 Application Deployment | Successfully deployed |
+| Live Website | Accessible through EC2 public IP |
+| Docker Compose | Frontend and backend services running |
+| RDS Connectivity | Backend connected to Amazon RDS |
+| Database Persistence | Task records verified in RDS |
+| VPC Networking | Custom VPC and subnets configured |
+| S3 Object Storage | Private bucket and test upload verified |
+| CloudWatch | EC2 CPU and network metrics verified |
+| Application Logging | Backend logs inspected through Docker Compose |
+| Service Quotas | EC2 quota reviewed |
+
+---
+
+## 7. Project Screenshots
+
+[View All Project Screenshots](./docs/screenshots/)
+
+---
+
+## 8. Repository Structure
 
 ```text
 cloud-task-management-app/
 │
-├── backend/
-│   ├── src/
-│   │   ├── config/
-│   │   │   └── db.js
-│   │   ├── server.js
-│   │   ├── Dockerfile
-│   │   └── package.json
-│   │
-│   ├── .env
-│   └── .env.example
-│
 ├── frontend/
-│   ├── public/
-│   ├── src/
-│   │   ├── App.jsx
-│   │   ├── App.css
-│   │   └── index.css
-│   ├── Dockerfile
-│   └── package.json
+│   └── React + Vite application
+│
+├── backend/
+│   └── Node.js + Express application
 │
 ├── docs/
+│   ├── screenshots/
+│   ├── architecture1.png
 │   ├── API-DOCUMENTATION.md
 │   └── DATABASE-DOCUMENTATION.md
 │
 ├── docker-compose.yml
-├── .env
-├── .gitignore
-└── README.md
+├── README.md
+└── .gitignore
 ```
 
-## Completed Features
+---
 
-### 1. Project Setup
+## 9. Learning Outcomes
 
-- Created the project directory and GitHub repository.
-- Initialized Git for version control.
-- Organized the project into backend, frontend, and documentation directories.
-- Configured `.gitignore` and environment variable example files.
+Through this project, I gained practical experience in:
 
-### 2. Backend Development
+- Deploying a full-stack application on AWS.
+- Working with Amazon EC2 and Ubuntu Linux.
+- Containerizing application services using Docker and Docker Compose.
+- Connecting backend applications to Amazon RDS MySQL.
+- Configuring AWS VPC, subnets, route tables, and security groups.
+- Working with private Amazon S3 object storage.
+- Reviewing EC2 metrics through Amazon CloudWatch.
+- Inspecting application logs using Docker Compose.
+- Reviewing AWS Service Quotas.
+- Managing application code and deployment configuration with Git and GitHub.
 
-- Built a REST API using Node.js and Express.js.
-- Configured environment variables using dotenv.
-- Enabled CORS for frontend-backend communication.
-- Implemented task CRUD endpoints.
-- Added API health-check functionality.
+---
 
-### 3. MySQL Database Integration
+## Project Information
 
-- Installed and configured MySQL Server 8.0.
-- Created the `task_management_db` database.
-- Created the `tasks` table.
-- Integrated MySQL using the `mysql2` package and connection pooling.
-- Configured database credentials through environment variables.
-- Verified database connectivity and task data operations.
+| Detail | Information |
+|---|---|
+| Project Name | Cloud Task Management App |
+| Project Type | Cloud Services & Web Application Deployment |
+| Cloud Provider | Amazon Web Services |
+| Compute Service | Amazon EC2 |
+| Database Service | Amazon RDS MySQL |
+| Storage Service | Amazon S3 |
+| Deployment | Docker Compose |
+| Repository | [GitHub](https://github.com/tahsinulhoque/cloud-task-management-app) |
 
-### 4. Frontend Development
+---
 
-- Set up React.js using Vite.
-- Built the TaskFlow user interface.
-- Added a task creation form.
-- Implemented the task listing interface.
-- Added task editing and deletion functionality.
-- Added task status update functionality.
-- Created responsive styling for the application.
-
-### 5. Frontend–Backend Integration Testing
-
-- Connected the React frontend with the Express.js REST API.
-- Integrated frontend task operations with the MySQL database.
-- Verified task creation and retrieval.
-- Tested task editing functionality.
-- Tested task status updates.
-- Verified task deletion functionality.
-- Fixed API response handling to display database records correctly.
-- Confirmed successful communication between frontend, backend, and MySQL.
-
-**Integration Testing Result:** All CRUD operations successfully tested.
-
-### 6. Dockerization
-
-- Created a Dockerfile for the Node.js backend.
-- Created a Dockerfile for the React frontend.
-- Configured Docker Compose to orchestrate frontend, backend, and MySQL services.
-- Configured environment variables for containerized services.
-- Implemented persistent MySQL storage using Docker volumes.
-- Configured Docker networking for inter-container communication.
-- Built frontend and backend Docker images.
-- Started all three services using Docker Compose.
-- Created the MySQL tasks table inside the Docker database.
-- Verified frontend and backend connectivity through Docker.
-- Tested task CRUD operations in the containerized environment.
-
-**Dockerization Result:** Frontend, backend, and MySQL successfully running as Docker Compose services.
-
-### 7. Documentation
-
-- Created API documentation.
-- Created database documentation.
-- Documented project structure, technology stack, and setup instructions.
-
-## API Endpoints
-
-Base URL: `http://localhost:5000`
-
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/api/health` | Check API and database health |
-| GET | `/api/tasks` | Retrieve all tasks |
-| GET | `/api/tasks/:id` | Retrieve a specific task |
-| POST | `/api/tasks` | Create a new task |
-| PUT | `/api/tasks/:id` | Update an existing task |
-| DELETE | `/api/tasks/:id` | Delete a task |
-
-## Database Schema
-
-**Database:** `task_management_db`
-
-**Table:** `tasks`
-
-| Column | Data Type | Description |
-|---|---|---|
-| id | VARCHAR(36) | Primary key |
-| title | VARCHAR(255) | Task title |
-| description | TEXT | Task description |
-| status | ENUM | pending, in-progress, completed |
-| created_at | TIMESTAMP | Creation timestamp |
-| updated_at | TIMESTAMP | Last update timestamp |
-
-## Docker Architecture
-
-The application uses Docker Compose to manage three services:
-
-| Service | Technology | Port |
-|---|---|---|
-| Frontend | React + Vite | 5173 |
-| Backend | Node.js + Express.js | 5000 |
-| Database | MySQL 8.0 | 3306 (container), 3307 (host) |
-
-### Docker Commands
-
-Build Docker images:
-
-```bash
-docker compose build
-```
-
-Start all services:
-
-```bash
-docker compose up -d
-```
-
-Check running containers:
-
-```bash
-docker compose ps
-```
-
-View container logs:
-
-```bash
-docker compose logs
-```
-
-Stop all services:
-
-```bash
-docker compose down
-```
-
-**Note:** MySQL data is persisted using a Docker named volume. The database table must be initialized before using the application with a fresh database volume.
-
-## Local Development Setup
-
-### Prerequisites
-
-- Node.js and npm
-- MySQL Server 8.0+
-- Git
-- Docker Desktop
-
-### Backend Setup
-
-```bash
-cd backend
-npm install
-```
-
-Configure `backend/.env`:
-
-```env
-PORT=5000
-NODE_ENV=development
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=your_mysql_password
-DB_NAME=task_management_db
-```
-
-Start the backend:
-
-```bash
-npm run dev
-```
-
-### Frontend Setup
-
-Open a separate terminal:
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Frontend URL:
-
-`http://localhost:5173`
-
-Backend API URL:
-
-`http://localhost:5000`
-
-## Project Roadmap
-
-- [x] Project initialization and GitHub setup
-- [x] Node.js and Express.js REST API
-- [x] MySQL database integration
-- [x] React and Vite frontend setup
-- [x] Task management UI
-- [x] Frontend-backend integration testing
-- [x] Dockerize frontend, backend, and database services
-- [ ] Configure AWS account and IAM
-- [ ] Configure AWS networking and VPC
-- [ ] Provision AWS EC2 infrastructure
-- [ ] Configure AWS RDS MySQL
-- [ ] Integrate AWS S3
-- [ ] Implement application security and secrets management
-- [ ] Deploy the application on AWS
-- [ ] Configure domain and HTTPS
-- [ ] Configure CloudWatch monitoring
-- [ ] Complete final testing and production documentation
-
-## Project Status
-
-**Development in Progress**
-
-The backend REST API, MySQL database integration, React frontend, frontend-backend integration testing, and Docker containerization have been completed.
-
-The next milestone is AWS account and IAM configuration, followed by cloud infrastructure setup, deployment, and monitoring.
-
-## Author
-
-**Tahsinul Hoque Siddiki**
-
-GitHub: [https://github.com/tahsinulhoque](https://github.com/tahsinulhoque)
+*This project demonstrates the practical implementation of AWS cloud infrastructure, full-stack application deployment, managed database connectivity, object storage, and cloud resource monitoring.*
